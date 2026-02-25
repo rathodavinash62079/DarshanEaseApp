@@ -1,0 +1,17 @@
+import React from "react";
+
+const Hero = () => {
+  return (
+    <div className="h-[200px] flex justify-center items-center bg-gray-100">
+
+      <h1 className="text-3xl font-bold text-gray-800">
+
+        Online Darshan Booking System
+
+      </h1>
+
+    </div>
+  );
+};
+
+export default Hero;
