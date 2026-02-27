@@ -10,121 +10,121 @@ const temples = [
   {
     name: "Kedarnath Temple",
     location: "Uttarakhand",
-    image: "https://images.unsplash.com/photo-1609766857041-ed402ea8069a"
+    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQq8eqlQ6y9v7kx1G4MkloR7y3ReYc2dQhEVg&s"
   },
 
   {
     name: "Badrinath Temple",
     location: "Uttarakhand",
-    image: "https://images.unsplash.com/photo-1627894483216-2138af692e32"
+    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSve9LBAZE9sJSkOwsmiU5Aq2NAZ-_SbBcjgg&s"
   },
 
   {
     name: "Tirupati Balaji",
     location: "Andhra Pradesh",
-    image: "https://images.unsplash.com/photo-1615378539073-8c0b3b5b7e33"
+    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ1S185C6gUp1q2TAt_RqFGEfRtcR4hR96__w&s"
   },
 
   {
     name: "Golden Temple",
     location: "Amritsar",
-    image: "https://images.unsplash.com/photo-1589308078054-8321c87b7d9e"
+    image: "https://www.whyweseek.com/wp-content/uploads/2020/01/facebook-amritsar.jpg"
   },
 
   {
     name: "Somnath Temple",
     location: "Gujarat",
-    image: "https://images.unsplash.com/photo-1625047509248-ec889cbff17f"
+    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTHA8YKr7J916iMpgceayRVrNob0EGpkC12kQ&s"
   },
 
   {
     name: "Meenakshi Temple",
     location: "Tamil Nadu",
-    image: "https://images.unsplash.com/photo-1567591377721-c011a89f5dcb"
+    image: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5d/MEENAKSHI_TEMPLE-_WEST_TOWER.jpg/250px-MEENAKSHI_TEMPLE-_WEST_TOWER.jpg"
   },
 
   {
     name: "Kashi Vishwanath",
     location: "Varanasi",
-    image: "https://images.unsplash.com/photo-1561361513-2d000a50f0dc"
+    image: "https://images.unsplash.com/photo-1561361513-2d000a50f0dhttps://temple.yatradham.org/public/Product/temple/temple_To4YlfIJ_202308271009080.jpgc"
   },
 
   {
     name: "Jagannath Temple",
     location: "Odisha",
-    image: "https://images.unsplash.com/photo-1623056615172-3b6cce6b1f7f"
+    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTjcBF3KEqp5zzlp4Uo8tG-0hWLRUNWLuBXnw&s"
   },
 
   {
     name: "Rameshwaram Temple",
     location: "Tamil Nadu",
-    image: "https://images.unsplash.com/photo-1588668214407-6ea9a6d8c272"
+    image: "https://www.justahotels.com/wp-content/uploads/2024/02/Ramanathaswamy-Temple.jpg"
   },
 
   {
     name: "Vaishno Devi",
     location: "Jammu",
-    image: "https://images.unsplash.com/photo-1605640840605-14ac1855827b"
+    image: "https://assets.cntraveller.in/photos/6656f8de517f32fd1d3eab4c/1:1/w_2865,h_2865,c_limit/vaishno%20devi.jpg"
   },
 
   {
     name: "Mahakaleshwar",
     location: "Ujjain",
-    image: "https://images.unsplash.com/photo-1623841930606-67e2bce48b78"
+    image: "https://www.ourkarnataka.com/wp-content/uploads/Gokarna-Mahabaleshwar-Temple-850x850.jpg"
   },
 
   {
     name: "Shirdi Sai Baba",
     location: "Maharashtra",
-    image: "https://images.unsplash.com/photo-1614145121029-83a9f7b68bf4"
+    image: "https://upload.wikimedia.org/wikipedia/commons/e/e4/Sai_baba_samadhi_mandir_.jpg"
   },
 
   {
     name: "Siddhivinayak",
     location: "Mumbai",
-    image: "https://images.unsplash.com/photo-1599661046827-dacff0c0f09a"
+    image: "https://divinehindu.com/wp-content/uploads/2025/12/Siddhivinayak-Temple.webp"
   },
 
   {
     name: "Iskcon Temple",
     location: "Bangalore",
-    image: "https://images.unsplash.com/photo-1627894482768-90d65d7d7c40"
+    image: "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/1a/d0/3d/93/iconic-view-iskcon-glory.jpg?w=900&h=500&s=1"
   },
 
   {
     name: "Akshardham",
     location: "Delhi",
-    image: "https://images.unsplash.com/photo-1582510003544-4d00b7f74220"
+    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT5-G9Ns2hlNMNnr4tJTdHQGQZMWaTndBRfqA&s"
   },
 
   {
     name: "Lotus Temple",
     location: "Delhi",
-    image: "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b"
+    image: "https://www.ice.org.uk/media/b3udopxv/aerial-view-of-lotus-temple-shutterstock.jpg"
   },
 
   {
     name: "Konark Sun Temple",
     location: "Odisha",
-    image: "https://images.unsplash.com/photo-1606298855672-3efb63017be8"
+    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSuiIfQag7y5Y5S1sKgkkiBfdiwreki2w62TA&s8"
   },
 
   {
     name: "Khatu Shyam",
     location: "Rajasthan",
-    image: "https://images.unsplash.com/photo-1612257999762-1e9e82e9f47f"
+    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS244JQ2DSDbqjWxgjVK70ix3ORbCLG9RL78w&s"
   },
 
   {
     name: "Dwarkadhish Temple",
     location: "Gujarat",
-    image: "https://images.unsplash.com/photo-1583267746897-2cf415887172"
+    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRacSweTUisIMSfwtFniIMH9-zBlH9PEEvswQ&s"
   },
 
   {
     name: "Padmanabhaswamy",
     location: "Kerala",
-    image: "https://images.unsplash.com/photo-1615484477778-ca3b77940c25"
+    image: "https://www.sreestours.com/wp-content/uploads/2025/08/sree-padmanabhaswamy-temple-thiruvananthapuram-4.jpg  "
   },
 
   // add more temples upto 30
@@ -132,61 +132,61 @@ const temples = [
   {
     name: "Chamundeshwari",
     location: "Mysore",
-    image: "https://images.unsplash.com/photo-1590766940554-634a7ed41450"
+    image: "https://upload.wikimedia.org/wikipedia/commons/d/d1/Chamundeshwari_Temple_Mysore.jpg"
   },
 
   {
     name: "Kalighat Temple",
     location: "Kolkata",
-    image: "https://images.unsplash.com/photo-1615897575936-6d6a9c1b3e5d"
+    image: "https://www.templewalks.com/wp-content/uploads/2025/08/kalighat-kali-temple.png"
   },
 
   {
     name: "Birla Mandir",
     location: "Hyderabad",
-    image: "https://images.unsplash.com/photo-1588402020427-6ec9a7e7e0d1"
+    image: "https://upload.wikimedia.org/wikipedia/commons/3/3c/Birla_Mandir%2C_Hyderabad.png"
   },
 
   {
     name: "Tiruchendur Temple",
     location: "Tamil Nadu",
-    image: "https://images.unsplash.com/photo-1623841930606-67e2bce48b78"
+    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRLNkvN-nW_BV-JJeGksU4JF1AO4jDJmgUlNw&s"
   },
 
   {
     name: "Gangotri Temple",
     location: "Uttarakhand",
-    image: "https://images.unsplash.com/photo-1623841930606-67e2bce48b78"
+    image: "https://www.tourmyindia.com/chardham/images/gangotri-dham1.jpg  "
   },
 
   {
     name: "Yamunotri Temple",
     location: "Uttarakhand",
-    image: "https://images.unsplash.com/photo-1623841930606-67e2bce48b78"
+    image: "https://temple.yatradham.org/public/Product/temple/temple_fO4FL40m_202506241837100.webp"
   },
 
   {
     name: "Lingaraj Temple",
     location: "Odisha",
-    image: "https://images.unsplash.com/photo-1623841930606-67e2bce48b78"
+    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSAKxrbwzqfE63ZCKVDYyUR3YlRWniDtJ5Zfw&s"
   },
 
   {
     name: "Hampi Temple",
     location: "Karnataka",
-    image: "https://images.unsplash.com/photo-1623841930606-67e2bce48b78"
+    image: "https://revolvingcompass.com/wp/wp-content/uploads/2024/02/VijayaVittala_3.jpg"
   },
 
   {
     name: "Chidambaram Temple",
     location: "Tamil Nadu",
-    image: "https://images.unsplash.com/photo-1623841930606-67e2bce48b78"
+    image: "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/05/80/f6/19/chidambaram-nataraja.jpg?w=1200&h=-1&s=1"
   },
 
   {
     name: "Murudeshwar Temple",
     location: "Karnataka",
-    image: "https://images.unsplash.com/photo-1623841930606-67e2bce48b78"
+    image: "https://kalavadyfarmstay.com/wp-content/uploads/2021/10/Mahashivratri-Murudeshwara-shutterstock_276471710.webp"
   }
 
 ];
