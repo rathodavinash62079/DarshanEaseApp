@@ -1,9 +1,8 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import TempleCard from "./TempleCard";
+import { api } from "../lib/api";
 
-const TempleRow = () => {
-
-const temples = [
+const fallbackTemples = [
 
 {
 name:"Kedarnath",
@@ -47,36 +46,50 @@ image:"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSKZaV-ZLczKJ6z7IPbv
 
 ];
 
-return (
+const TempleRow = () => {
+  const [temples, setTemples] = useState(fallbackTemples);
 
-<div className="bg-white p-5 mt-0">
+  useEffect(() => {
+    (async () => {
+      try {
+        const { data } = await api.get("/api/temples");
+        if (Array.isArray(data) && data.length) {
+          setTemples(data.map(t => ({ name: t.name, image: t.image })));
+        }
+      } catch (e) { void e; }
+    })();
+  }, []);
 
-<h2 className="text-2xl font-semibold mb-3">
-
-Select Temple
-
-</h2>
-
-<div className="flex gap-4 overflow-x-auto">
-
-{
-temples.map((temple,index)=>(
-
-<TempleCard
-key={index}
-name={temple.name}
-image={temple.image}
-/>
-
-))
-}
-
-</div>
-
-</div>
-
-);
-
-};
+  return (
+  
+  <div className="bg-white p-5 mt-0">
+  
+  <h2 className="text-2xl font-semibold mb-3">
+  
+  Select Temple
+  
+  </h2>
+  
+  <div className="flex gap-4 overflow-x-auto">
+  
+  {
+  temples.map((temple,index)=>(
+  
+  <TempleCard
+  key={index}
+  name={temple.name}
+  image={temple.image}
+  />
+  
+  ))
+  }
+  
+  </div>
+  
+  </div>
+  
+  );
+  
+  };
 
 export default TempleRow;

@@ -1,6 +1,47 @@
-import React from "react";
+import React, { useState } from "react";
+import { api } from "../lib/api";
 
 function Signup() {
+
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirm, setConfirm] = useState("");
+  const [error, setError] = useState("");
+
+  const handleRegister = async (e) => {
+    e.preventDefault();
+    setError("");
+    if (!name || !email || !password || !confirm) {
+      setError("Please fill all fields");
+      return;
+    }
+    if (password !== confirm) {
+      setError("Passwords do not match");
+      return;
+    }
+    try {
+      const { data } = await api.post("/api/auth/register", { name, email, password });
+      if (data?.token) localStorage.setItem("darshan_token", data.token);
+      if (data?.user) localStorage.setItem("darshan_user", JSON.stringify(data.user));
+      if (!data?.user) {
+        const user = { name, email };
+        localStorage.setItem("darshan_user", JSON.stringify(user));
+      }
+      document.getElementById("register_modal")?.close();
+      alert("Registered successfully");
+    } catch {
+      const user = { name, email };
+      localStorage.setItem("darshan_user", JSON.stringify(user));
+      document.getElementById("register_modal")?.close();
+      alert("Registered (offline mode)");
+    }
+  };
+
+  const openLogin = () => {
+    document.getElementById("register_modal")?.close();
+    document.getElementById("my_modal_3")?.showModal();
+  };
 
   return (
 
@@ -36,20 +77,8 @@ function Signup() {
             <input
               type="text"
               placeholder="Enter your name"
-              className="input input-bordered w-full bg-white text-black"
-            />
-
-          </div>
-
-
-          {/* Username */}
-          <div>
-
-            <label className="label">Username</label>
-
-            <input
-              type="text"
-              placeholder="Enter your username"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
               className="input input-bordered w-full bg-white text-black"
             />
 
@@ -64,20 +93,8 @@ function Signup() {
             <input
               type="email"
               placeholder="Enter your email"
-              className="input input-bordered w-full bg-white text-black"
-            />
-
-          </div>
-
-
-          {/* Phone */}
-          <div>
-
-            <label className="label">Phone Number</label>
-
-            <input
-              type="text"
-              placeholder="Enter your number"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               className="input input-bordered w-full bg-white text-black"
             />
 
@@ -92,6 +109,8 @@ function Signup() {
             <input
               type="password"
               placeholder="Enter your password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
               className="input input-bordered w-full bg-white text-black"
             />
 
@@ -106,6 +125,8 @@ function Signup() {
             <input
               type="password"
               placeholder="Confirm your password"
+              value={confirm}
+              onChange={(e) => setConfirm(e.target.value)}
               className="input input-bordered w-full bg-white text-black"
             />
 
@@ -113,54 +134,25 @@ function Signup() {
 
         </div>
 
-
-        {/* Gender */}
-        <div className="mt-6">
-
-          <label className="label font-semibold">Gender</label>
-
-          <div className="flex gap-6 mt-2">
-
-
-            <label className="flex items-center gap-2">
-
-              <input type="radio" name="gender" className="radio" />
-
-              Male
-
-            </label>
-
-
-            <label className="flex items-center gap-2">
-
-              <input type="radio" name="gender" className="radio" />
-
-              Female
-
-            </label>
-
-
-            <label className="flex items-center gap-2">
-
-              <input type="radio" name="gender" className="radio" />
-
-              Prefer not to say
-
-            </label>
-
-
-          </div>
-
-        </div>
-
-
         {/* Register Button */}
-        <button className="w-full mt-6 py-3 rounded-lg text-white font-semibold bg-gradient-to-r from-blue-400 to-purple-500">
+        {error && (
+          <div className="alert alert-error mt-4">
+            <span>{error}</span>
+          </div>
+        )}
+
+        <button onClick={handleRegister} className="w-full mt-6 py-3 rounded-lg text-white font-semibold bg-gradient-to-r from-blue-400 to-purple-500">
 
           Register
 
         </button>
 
+        <div className="text-center mt-4 text-sm">
+          <span className="mr-2">Already have an account?</span>
+          <button onClick={openLogin} className="btn btn-link text-blue-600 no-underline">
+            Login
+          </button>
+        </div>
 
       </div>
 

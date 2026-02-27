@@ -1,0 +1,126 @@
+{
+  "info": {
+    "name": "TempleEase Auth",
+    "_postman_id": "f0c8d5c4-8c8e-4c8b-a5bf-3b5a5e1e9f00",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Signup (Register)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Test User\",\n  \"email\": \"testuser@gmail.com\",\n  \"password\": \"Passw0rd123\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/auth/register",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "auth", "register"]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is 200/201\", function () {",
+              "  pm.expect(pm.response.code).to.be.oneOf([200,201]);",
+              "});",
+              "try {",
+              "  const json = pm.response.json();",
+              "  if (json && json.token) {",
+              "    pm.environment.set(\"token\", json.token);",
+              "  }",
+              "  if (json && json.user && json.user.email) {",
+              "    pm.environment.set(\"email\", json.user.email);",
+              "  }",
+              "} catch (e) {}"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Login",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"{{loginEmail}}\",\n  \"password\": \"{{loginPassword}}\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/auth/login",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "auth", "login"]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "  pm.expect(pm.response.code).to.be.oneOf([200]);",
+              "});",
+              "try {",
+              "  const json = pm.response.json();",
+              "  if (json && json.token) {",
+              "    pm.environment.set(\"token\", json.token);",
+              "  }",
+              "  if (json && json.user && json.user.email) {",
+              "    pm.environment.set(\"email\", json.user.email);",
+              "  }",
+              "} catch (e) {}"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Book Temple",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"temple\": \"Kedarnath Temple\",\n  \"date\": \"2026-03-01\",\n  \"time\": \"10:30 AM\",\n  \"phone\": \"9876543210\",\n  \"service\": \"Darshan\",\n  \"amount\": 100,\n  \"paymentMethod\": \"UPI\",\n  \"fullName\": \"Test User\",\n  \"email\": \"testuser@gmail.com\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/book",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "book"]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is 201\", function () {",
+              "  pm.expect(pm.response.code).to.be.oneOf([201]);",
+              "});"
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:5000" },
+    { "key": "loginEmail", "value": "testuser@gmail.com" },
+    { "key": "loginPassword", "value": "Passw0rd123" }
+  ]
+}

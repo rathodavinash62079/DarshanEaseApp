@@ -12,10 +12,8 @@ const Navbar = () => {
     
     <div className="navbar bg-primary text-white px-10 shadow-md sticky-top-0 w-full z-50">
 
-      {/* LEFT */}
       <div className="navbar-start">
 
-        {/* Mobile menu */}
         <div className="dropdown">
 
           <div tabIndex={0} role="button" className="btn btn-ghost lg:hidden">
@@ -55,30 +53,26 @@ const Navbar = () => {
 
       </div>
 
-      {/* CENTER MENU */}
       <div className="navbar-center hidden lg:flex">
 
         <ul className="menu menu-horizontal px-1">
 
-          <li><a href="#">Home</a></li>
-          <li><a href="#">Contact</a></li>
-          <li><a href="#">About</a></li>
+          <li><Link to="/">Home</Link></li>
+          <li><Link to="/contact">Contact</Link></li>
+          <li><Link to="/about">About</Link></li>
 
         </ul>
 
       </div>
 
-      {/* Search */}
       <label className="input input-bordered flex items-center gap-8">
         <input type="text" className="grow" placeholder="Search" />
       </label>
     
 
     <label className="swap swap-rotate">
-  {/* this hidden checkbox controls the state */}
   <input type="checkbox" className="theme-controller" value="synthwave" />
 
-  {/* sun icon */}
   <svg
     className="swap-off h-10 w-10 fill-current"
     xmlns="http://www.w3.org/2000/svg"
@@ -87,7 +81,6 @@ const Navbar = () => {
       d="M5.64,17l-.71.71a1,1,0,0,0,0,1.41,1,1,0,0,0,1.41,0l.71-.71A1,1,0,0,0,5.64,17ZM5,12a1,1,0,0,0-1-1H3a1,1,0,0,0,0,2H4A1,1,0,0,0,5,12Zm7-7a1,1,0,0,0,1-1V3a1,1,0,0,0-2,0V4A1,1,0,0,0,12,5ZM5.64,7.05a1,1,0,0,0,.7.29,1,1,0,0,0,.71-.29,1,1,0,0,0,0-1.41l-.71-.71A1,1,0,0,0,4.93,6.34Zm12,.29a1,1,0,0,0,.7-.29l.71-.71a1,1,0,1,0-1.41-1.41L17,5.64a1,1,0,0,0,0,1.41A1,1,0,0,0,17.66,7.34ZM21,11H20a1,1,0,0,0,0,2h1a1,1,0,0,0,0-2Zm-9,8a1,1,0,0,0-1,1v1a1,1,0,0,0,2,0V20A1,1,0,0,0,12,19ZM18.36,17A1,1,0,0,0,17,18.36l.71.71a1,1,0,0,0,1.41,0,1,1,0,0,0,0-1.41ZM12,6.5A5.5,5.5,0,1,0,17.5,12,5.51,5.51,0,0,0,12,6.5Zm0,9A3.5,3.5,0,1,1,15.5,12,3.5,3.5,0,0,1,12,15.5Z" />
   </svg>
 
-  {/* moon icon */}
   <svg
     className="swap-on h-10 w-10 fill-current"
     xmlns="http://www.w3.org/2000/svg"
@@ -100,32 +93,30 @@ const Navbar = () => {
 
 
 
-      {/* RIGHT SIDE */}
       <div className="navbar-end flex gap-3">
 
-        <button className="btn bg-white text-primary"
-        onClick={()=>document.getElementById("my_modal_3").showModal()}>
-          
-          Login
-        
-        </button>
+        <AuthButton />
 
         <Login/>
-      
 
-      </div>
-        <div >
-
-        <button className="btn bg-white text-primary"
-        onClick={()=>document.getElementById("register_modal").showModal()}>
-          
-         Register
-        
-        </button>
-
-       <Signup/>
-      
-
+        <div className="dropdown dropdown-end">
+          <div tabIndex={0} role="button" className="btn btn-ghost text-white">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
+              <path d="M6 10a2 2 0 11-4 0 2 2 0 014 0zm6 0a2 2 0 11-4 0 2 2 0 014 0zm6 0a2 2 0 11-4 0 2 2 0 014 0z" />
+            </svg>
+          </div>
+          <ul tabIndex={0} className="menu menu-sm dropdown-content bg-base-100 text-black rounded-box mt-3 w-52 p-2 shadow">
+            <li><Link to="/my-bookings">My Bookings</Link></li>
+            <li><Link to="/more-temples">More Temples</Link></li>
+            <li><Link to="/about">About</Link></li>
+            <li><Link to="/contact">Contact</Link></li>
+            <li className="menu-title">Admin</li>
+            <li><Link to="/admin/temples">Manage Temples</Link></li>
+            <li><Link to="/admin/bookings">Manage Bookings</Link></li>
+            <li><a onClick={() => { localStorage.removeItem('darshan_user'); alert('Logged out'); }}>Logout</a></li>
+          </ul>
+        </div>
+        <Signup/>
       </div>
 
     </div>
@@ -135,3 +126,36 @@ const Navbar = () => {
 };
 
 export default Navbar;
+
+const AuthButton = () => {
+  const [authed, setAuthed] = React.useState(false);
+  React.useEffect(() => {
+    const check = () => {
+      try {
+        const u = localStorage.getItem("darshan_user");
+        const t = localStorage.getItem("darshan_token");
+        setAuthed(!!(u || t));
+      } catch { setAuthed(false); }
+    };
+    check();
+    const onChange = () => check();
+    window.addEventListener("storage", onChange);
+    window.addEventListener("darshan-auth-change", onChange);
+    return () => {
+      window.removeEventListener("storage", onChange);
+      window.removeEventListener("darshan-auth-change", onChange);
+    };
+  }, []);
+  const onLogin = () => document.getElementById("my_modal_3").showModal();
+  const onLogout = () => {
+    localStorage.removeItem("darshan_user");
+    localStorage.removeItem("darshan_token");
+    window.dispatchEvent(new Event("darshan-auth-change"));
+    alert("Logged out");
+  };
+  return (
+    <button className="btn bg-white text-primary" onClick={authed ? onLogout : onLogin}>
+      {authed ? "Logout" : "Login"}
+    </button>
+  );
+};

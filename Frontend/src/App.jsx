@@ -4,6 +4,11 @@ import Home from "./pages/Home";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
 import MoreTemple from "./pages/MoreTemple";
+import TempleDetails from "./pages/TempleDetails";
+import BookNow from "./pages/BookNow";
+import MyBookings from "./pages/MyBookings";
+import AdminTemples from "./pages/AdminTemples";
+import AdminBookings from "./pages/AdminBookings";
 
 
 function App() {
@@ -22,6 +27,11 @@ function App() {
 
         <Route path="/more-temples" element={<MoreTemple />} />
 
+        <Route path="/temple/:slug" element={<TempleDetails />} />
+        <Route path="/book" element={<BookNow />} />
+        <Route path="/my-bookings" element={<MyBookings />} />
+        <Route path="/admin/temples" element={<AdminTemples />} />
+        <Route path="/admin/bookings" element={<AdminBookings />} />
        
 
 

@@ -11,7 +11,6 @@ import Banner from "../components/Banner";
 import { Link } from "react-router-dom";
 
 import Login from "../components/Login";
-import signup from "../components/Signup";
 
 
 

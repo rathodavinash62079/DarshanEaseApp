@@ -1,10 +1,55 @@
-import React from "react";
+import React, { useState } from "react";
 import { FaFacebookF, FaGoogle } from "react-icons/fa";
+import { api } from "../lib/api";
 
 function Login() {
 
-  return (
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
 
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    setError("");
+    if (!email || !password) {
+      setError("Please enter email and password");
+      return;
+    }
+    const gmailOk = /^[A-Za-z0-9._%+-]+@gmail\.com$/i.test(email);
+    if (!gmailOk) {
+      setError("Invalid email. Use a @gmail.com address");
+      return;
+    }
+    try {
+      const { data } = await api.post("/api/auth/login", { email, password });
+      if (data?.token) localStorage.setItem("darshan_token", data.token);
+      if (data?.user) localStorage.setItem("darshan_user", JSON.stringify(data.user));
+      if (!data?.user) {
+        const user = { email };
+        localStorage.setItem("darshan_user", JSON.stringify(user));
+      }
+      window.dispatchEvent(new Event("darshan-auth-change"));
+      document.getElementById("my_modal_3")?.close();
+      document.getElementById("login_success_modal")?.showModal();
+    } catch (err) {
+      let msg = err?.response?.data?.message || err?.response?.data?.error || "Login failed";
+      if (/invalid password/i.test(msg)) {
+        setError("Invalid password");
+      } else if (/not registered/i.test(msg)) {
+        setError("User not registered, please signup first");
+      } else {
+        setError(msg);
+      }
+    }
+  };
+
+  const openSignup = () => {
+    document.getElementById("my_modal_3")?.close();
+    document.getElementById("register_modal")?.showModal();
+  };
+
+  return (
+    <>
     <dialog id="my_modal_3" className="modal modal-middle">
 
       <div className="modal-box bg-white text-black p-10 max-w-md relative overflow-hidden">
@@ -28,6 +73,8 @@ function Login() {
         <input
           type="email"
           placeholder="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
           className="input input-bordered w-full bg-white text-black placeholder-gray-400 focus:bg-white focus:text-black"
         />
 
@@ -36,6 +83,8 @@ function Login() {
        <input
   type="password"
   placeholder="Password"
+  value={password}
+  onChange={(e) => setPassword(e.target.value)}
   className="input input-bordered w-full mb-4 bg-white text-black placeholder-gray-400 focus:bg-white focus:text-black"
 />
 
@@ -50,9 +99,15 @@ function Login() {
           Remember me
         </div>
 
+        {/* Error */}
+        {error && (
+          <div className="alert alert-error mb-3">
+            <span>{error}</span>
+          </div>
+        )}
 
         {/* Login Button */}
-        <button className="btn w-full bg-pink-500 text-white border-none hover:bg-pink-600 mb-4">
+        <button onClick={handleLogin} className="btn w-full bg-pink-500 text-white border-none hover:bg-pink-600 mb-4">
           LOGIN
         </button>
 
@@ -92,22 +147,35 @@ function Login() {
 
 
         {/* Signup */}
-        <p className="text-center mt-6 text-sm">
-          Not a member?
-           <Link to="/more-temples">
-
-          <button className="btn btn-warning">
-
-            More Temples
-
+        <div className="text-center mt-6 text-sm">
+          <span className="mr-2">Not a member?</span>
+          <button onClick={openSignup} className="btn btn-link text-blue-600 no-underline">
+            Go to Signup
           </button>
-        </p>
+        </div>
 
 
       </div>
 
     </dialog>
 
+    <dialog id="login_success_modal" className="modal modal-middle">
+      <div className="modal-box bg-white text-black p-10 max-w-md">
+        <div className="flex flex-col items-center gap-3">
+          <div className="rounded-full bg-green-100 p-4">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-green-600" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm4.3 7.3-5 5a1 1 0 0 1-1.4 0l-2-2a1 1 0 0 1 1.4-1.4l1.3 1.29 4.3-4.29a1 1 0 1 1 1.4 1.4Z"/>
+            </svg>
+          </div>
+          <h3 className="text-2xl font-bold text-green-600 text-center">Login successful!</h3>
+          <p className="text-center text-gray-600">You are now signed in to Darshan Ease.</p>
+          <form method="dialog" className="mt-2">
+            <button className="btn btn-success w-32">Ok</button>
+          </form>
+        </div>
+      </div>
+    </dialog>
+    </>
   );
 
 }
