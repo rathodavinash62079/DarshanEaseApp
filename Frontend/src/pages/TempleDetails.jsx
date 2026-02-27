@@ -1,11 +1,28 @@
-import React from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+import { api } from "../lib/api";
 
 const TempleDetails = () => {
   const { slug } = useParams();
-  const name = slug.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+  const name = useMemo(() => slug.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()), [slug]);
+  const [templeId, setTempleId] = useState("");
+  const [slots, setSlots] = useState([]);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const { data } = await api.get("/api/temples");
+        const t = Array.isArray(data) ? data.find(x => String(x.name).toLowerCase() === name.toLowerCase()) : null;
+        if (t?._id) {
+          setTempleId(t._id);
+          const resp = await api.get(`/api/slots?templeId=${t._id}`);
+          setSlots(Array.isArray(resp.data) ? resp.data : []);
+        }
+      } catch (e) { void e; }
+    })();
+  }, [name]);
   return (
     <>
       <Navbar />
@@ -34,6 +51,30 @@ const TempleDetails = () => {
               </div>
             </div>
           </div>
+          {templeId && (
+            <div className="mt-8">
+              <h2 className="text-xl font-semibold mb-3">Darshan Slots</h2>
+              {slots.length === 0 ? (
+                <div className="alert"><span>No slots available.</span></div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  {slots.map(s => (
+                    <div key={s._id} className="card bg-white shadow">
+                      <div className="card-body">
+                        <h3 className="card-title">{s.date}</h3>
+                        <p>Time: {s.startTime} - {s.endTime}</p>
+                        <p>Seats: {s.availableSeats}</p>
+                        <p>Price: ₹{s.price}</p>
+                        <a href={`/book?temple=${encodeURIComponent(name)}&slotId=${s._id}`} className="btn btn-primary mt-2">
+                          Book Now
+                        </a>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
       <Footer />

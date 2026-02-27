@@ -17,6 +17,7 @@ const MyBookings = () => {
           if (Array.isArray(data)) apiList = data;
         } catch (e) { void e; }
         const normalizedApi = apiList.map(b => ({
+          _id: b._id,
           temple: b.temple,
           service: b.service,
           date: b.date,
@@ -24,9 +25,14 @@ const MyBookings = () => {
           fullName: b.fullName || "",
           email: b.email || "",
           phone: b.phone || "",
+          quantity: b.quantity || 1,
+          amount: b.amount || 0,
+          totalAmount: b.totalAmount || 0,
+          convenienceFee: b.convenienceFee || 0,
           _src: "api",
         }));
         const normalizedLocal = localList.map(b => ({
+          _id: b._id,
           temple: b.temple,
           service: b.service,
           date: b.date,
@@ -34,6 +40,10 @@ const MyBookings = () => {
           fullName: b.fullName || "",
           email: b.email || "",
           phone: b.phone || "",
+          quantity: b.quantity || 1,
+          amount: b.amount || 0,
+          totalAmount: b.totalAmount || 0,
+          convenienceFee: b.convenienceFee || 0,
           _src: "local",
         }));
         // Merge and de-duplicate by (temple+date+time+phone+service)
@@ -79,27 +89,36 @@ const MyBookings = () => {
               <table className="table">
                 <thead>
                   <tr>
+                    <th>Booking ID</th>
                     <th>Temple</th>
                     <th>Service</th>
                     <th>Date</th>
                     <th>Time</th>
+                    <th>Qty</th>
+                    <th>Price</th>
                     <th>Name</th>
                     <th>Email</th>
                     <th>Phone</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {bookings.map((b, idx) => (
-                    <tr key={idx}>
-                      <td>{b.temple}</td>
-                      <td>{b.service}</td>
-                      <td>{b.date}</td>
-                      <td>{b.time}</td>
-                      <td>{b.fullName}</td>
-                      <td>{b.email}</td>
-                      <td>{b.phone}</td>
-                    </tr>
-                  ))}
+                  {bookings.map((b, idx) => {
+                    const total = b.totalAmount ?? (b.amount || 0) * (b.quantity || 1) + (b.convenienceFee || 0);
+                    return (
+                      <tr key={idx}>
+                        <td>{b._id || "-"}</td>
+                        <td>{b.temple}</td>
+                        <td>{b.service}</td>
+                        <td>{b.date}</td>
+                        <td>{b.time}</td>
+                        <td>{b.quantity || 1}</td>
+                        <td>₹{total}</td>
+                        <td>{b.fullName}</td>
+                        <td>{b.email}</td>
+                        <td>{b.phone}</td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>

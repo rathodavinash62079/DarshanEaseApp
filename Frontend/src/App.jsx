@@ -9,6 +9,7 @@ import BookNow from "./pages/BookNow";
 import MyBookings from "./pages/MyBookings";
 import AdminTemples from "./pages/AdminTemples";
 import AdminBookings from "./pages/AdminBookings";
+import AdminSlots from "./pages/AdminSlots";
 
 
 function App() {
@@ -32,6 +33,7 @@ function App() {
         <Route path="/my-bookings" element={<MyBookings />} />
         <Route path="/admin/temples" element={<AdminTemples />} />
         <Route path="/admin/bookings" element={<AdminBookings />} />
+        <Route path="/admin/slots" element={<AdminSlots />} />
        
 
 

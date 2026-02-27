@@ -6,9 +6,10 @@ const templeSchema = new mongoose.Schema(
     location: { type: String, required: true },
     image: { type: String, required: true },
     description: { type: String, default: "" },
+    darshanStartTime: { type: String, default: "" },
+    darshanEndTime: { type: String, default: "" },
   },
   { timestamps: true }
 );
 
 export default mongoose.model("Temple", templeSchema);
-

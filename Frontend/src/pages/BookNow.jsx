@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
@@ -7,6 +7,7 @@ import { api } from "../lib/api";
 const BookNow = () => {
   const [params] = useSearchParams();
   const temple = params.get("temple") || "";
+  const slotId = params.get("slotId") || "";
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
@@ -17,6 +18,9 @@ const BookNow = () => {
   const [success, setSuccess] = useState("");
   const [step, setStep] = useState("form");
   const [paymentMethod, setPaymentMethod] = useState("");
+  const [quantity, setQuantity] = useState(1);
+  const [fee] = useState(45);
+  const [slotPrice, setSlotPrice] = useState(null);
 
   const basePrice = (type) => {
     if (type === "Special Puja") return 500;
@@ -27,7 +31,24 @@ const BookNow = () => {
     try { return JSON.parse(localStorage.getItem("darshan_bookings") || "[]").length * 10; } catch { return 0; }
   })();
   const discount = loyalty >= 50 ? 0.1 : 0; // 10% off if 50+ points
-  const amount = Math.max(0, Math.round(basePrice(service || "Darshan") * (1 - discount)));
+  const unit = Math.max(0, Math.round(basePrice(service || "Darshan") * (1 - discount)));
+  const effectiveUnit = slotPrice != null ? slotPrice : unit;
+  const amount = effectiveUnit * Math.max(1, Number(quantity) || 1) + fee;
+
+  useEffect(() => {
+    (async () => {
+      if (!slotId) return;
+      try {
+        const { data } = await api.get(`/api/slots/${slotId}`);
+        if (data?._id) {
+          setSlotPrice(Number(data.price) || 0);
+          setService("Darshan");
+          setDate(data.date);
+          setTime(`${data.startTime} - ${data.endTime}`);
+        }
+      } catch (e) { void e; }
+    })();
+  }, [slotId]);
 
   const onSubmit = (e) => {
     e.preventDefault();
@@ -52,7 +73,22 @@ const BookNow = () => {
       setError("Please select a payment method");
       return;
     }
-    const booking = { temple, fullName, email, phone, date, time, service, amount, paymentMethod, createdAt: new Date().toISOString() };
+    const booking = {
+      temple,
+      fullName,
+      email,
+      phone,
+      date,
+      time,
+      service,
+      slotId: slotId || undefined,
+      amount: effectiveUnit,
+      quantity: Math.max(1, Number(quantity) || 1),
+      convenienceFee: fee,
+      totalAmount: amount,
+      paymentMethod,
+      createdAt: new Date().toISOString()
+    };
     try {
       const existing = JSON.parse(localStorage.getItem("darshan_bookings") || "[]");
       existing.push(booking);
@@ -97,11 +133,11 @@ const BookNow = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div>
                 <label className="label">Date</label>
-                <input type="date" value={date} onChange={(e)=>setDate(e.target.value)} className="input input-bordered w-full bg-white text-black" />
+                <input type="date" value={date} onChange={(e)=>setDate(e.target.value)} disabled={!!slotId} className="input input-bordered w-full bg-white text-black" />
               </div>
               <div>
                 <label className="label">Time Slot</label>
-                <select value={time} onChange={(e)=>setTime(e.target.value)} className="select select-bordered w-full bg-white text-black">
+                <select value={time} onChange={(e)=>setTime(e.target.value)} disabled={!!slotId} className="select select-bordered w-full bg-white text-black">
                   <option value="" disabled>Select a slot</option>
                   <option>06:00 AM - 07:00 AM</option>
                   <option>07:00 AM - 08:00 AM</option>
@@ -113,16 +149,25 @@ const BookNow = () => {
             </div>
             <div>
               <label className="label">Service Type</label>
-              <select value={service} onChange={(e)=>setService(e.target.value)} className="select select-bordered w-full bg-white text-black">
+              <select value={service} onChange={(e)=>setService(e.target.value)} disabled={!!slotId} className="select select-bordered w-full bg-white text-black">
                 <option value="" disabled>Select a service</option>
                 <option>Darshan</option>
                 <option>Special Puja</option>
                 <option>Accommodation</option>
               </select>
             </div>
-            <div className="flex items-center justify-between mt-2">
-              <div className="badge badge-ghost p-3">Loyalty: {loyalty} pts {discount ? "(10% off)" : ""}</div>
-              <div className="badge badge-primary p-3">Amount: ₹{amount}</div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mt-2">
+              <div className="form-control">
+                <label className="label">Quantity</label>
+                <div className="join">
+                  <button type="button" className="btn join-item" onClick={()=>setQuantity(q=>Math.max(1, q-1))}>-</button>
+                  <input className="input input-bordered join-item w-16 text-center"
+                         value={quantity} onChange={(e)=>setQuantity(Math.max(1, parseInt(e.target.value||'1',10) || 1))}/>
+                  <button type="button" className="btn join-item" onClick={()=>setQuantity(q=>q+1)}>+</button>
+                </div>
+              </div>
+              <div className="badge badge-ghost p-3 self-end">Loyalty: {loyalty} pts {discount ? "(10% off)" : ""}</div>
+              <div className="badge badge-primary p-3 self-end">Unit: ₹{effectiveUnit}</div>
             </div>
             <button type="submit" className="btn btn-primary w-full mt-2">Proceed to Payment</button>
           </form>
@@ -131,8 +176,9 @@ const BookNow = () => {
             <form onSubmit={onPay} className="space-y-3">
               <div className="stats shadow w-full">
                 <div className="stat">
-                  <div className="stat-title">Payable Amount</div>
+                  <div className="stat-title">Summary</div>
                   <div className="stat-value">₹{amount}</div>
+                  <div className="stat-desc">Unit ₹{effectiveUnit} × {quantity} + Fee ₹{fee}</div>
                   {discount ? <div className="stat-desc">Includes 10% loyalty discount</div> : null}
                 </div>
               </div>

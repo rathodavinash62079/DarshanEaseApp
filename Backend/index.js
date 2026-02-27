@@ -4,9 +4,10 @@ import dotenv from "dotenv";
 import mongoose from "mongoose";
 import authRouter from "./route/auth.route.js";
 import templeRouter from "./route/temple.route.js";
-import bookRouter from "./routes/book.route.js";
 import bookingRoutes from "./routes/bookingRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
+import slotRoutes from "./routes/slot.route.js";
+import ticketRoutes from "./routes/ticketRoutes.js";
 import Temple from "./model/temple.model.js";
 import userRouter from "./routes/user.js";
 
@@ -35,9 +36,10 @@ connectMongo().catch((e) => console.error("Mongo error:", e.message));
 
 app.use("/api/auth", authRouter);
 app.use("/api/temples", templeRouter);
-app.use("/api/book", bookRouter);
 app.use("/api", bookingRoutes);
 app.use("/api", userRoutes);
+app.use("/api/slots", slotRoutes);
+app.use("/api", ticketRoutes);
 app.use("/user", userRouter);
 
 app.get("/", (_req, res) => res.send("Darshan Ease API running"));
