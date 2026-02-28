@@ -1,26 +1,139 @@
 import mongoose from "mongoose";
 import dotenv from "dotenv";
 import bcrypt from "bcryptjs";
+import fs from "fs";
+import path from "path";
+import User from "../model/user.model.js";
+import Temple from "../model/temple.model.js";
+import DarshanSlot from "../model/darshanSlot.model.js";
+import Booking from "../model/booking.model.js";
 
 dotenv.config();
 
 const uri = process.env.MONGO_URI || "mongodb://127.0.0.1:27017/darshanease";
 const dbName = process.env.MONGO_DB || "darshanease";
 
-const userSchema = new mongoose.Schema(
-  { name: String, email: { type: String, unique: true }, password: String },
-  { timestamps: true }
-);
+function readJsonArray(filePath) {
+  try {
+    const data = fs.readFileSync(filePath, "utf8");
+    const json = JSON.parse(data);
+    return Array.isArray(json) ? json : [];
+  } catch {
+    return [];
+  }
+}
 
-const templeSchema = new mongoose.Schema(
-  { name: String, location: String, image: String, description: String },
-  { timestamps: true }
-);
+function asObjectId(v) {
+  try {
+    if (!v) return undefined;
+    if (typeof v === "string" && /^[a-fA-F0-9]{24}$/.test(v)) return new mongoose.Types.ObjectId(v);
+    if (typeof v === "object" && v.$oid && /^[a-fA-F0-9]{24}$/.test(v.$oid)) return new mongoose.Types.ObjectId(v.$oid);
+  } catch {}
+  return undefined;
+}
+
+async function upsertUsers(arr) {
+  for (const u of arr) {
+    if (!u?.email) continue;
+    const doc = {
+      name: String(u.name || "").trim() || "User",
+      email: String(u.email).trim(),
+      password: u.password || "Passw0rd123"
+    };
+    await User.updateOne(
+      { email: new RegExp(`^${doc.email.replace(/[.*+?^${}()|[\\]\\\\]/g, "\\$&")}$`, "i") },
+      { $setOnInsert: doc },
+      { upsert: true }
+    );
+  }
+}
+
+async function upsertTemples(arr) {
+  for (const t of arr) {
+    if (!t?.name) continue;
+    const doc = {
+      name: String(t.name).trim(),
+      location: t.location || "",
+      image: t.image || "",
+      description: t.description || ""
+    };
+    await Temple.updateOne(
+      { name: new RegExp(`^${doc.name.replace(/[.*+?^${}()|[\\]\\\\]/g, "\\$&")}$`, "i") },
+      { $set: doc },
+      { upsert: true }
+    );
+  }
+}
+
+async function upsertSlots(arr) {
+  for (const s of arr) {
+    const date = s?.date;
+    const startTime = s?.startTime;
+    const endTime = s?.endTime;
+    let templeId = s?.templeId;
+    if (!templeId && s?.templeName) {
+      const t = await Temple.findOne({ name: new RegExp(`^${String(s.templeName).replace(/[.*+?^${}()|[\\]\\\\]/g, "\\$&")}$`, "i") });
+      if (t) templeId = t._id;
+    }
+    if (!templeId || !date || !startTime || !endTime) continue;
+    const doc = {
+      templeId,
+      date,
+      startTime,
+      endTime,
+      availableSeats: Number(s.availableSeats ?? 0),
+      price: Number(s.price ?? 0)
+    };
+    const key = { templeId, date, startTime, endTime };
+    await DarshanSlot.updateOne(key, { $set: doc }, { upsert: true });
+  }
+}
+
+async function upsertBookings(arr) {
+  for (const b of arr) {
+    let userId = asObjectId(b?.userId) || undefined;
+    if (!userId && b?.email) {
+      const u = await User.findOne({ email: new RegExp(`^${String(b.email).replace(/[.*+?^${}()|[\\]\\\\]/g, "\\$&")}$`, "i") });
+      if (u) userId = u._id;
+    }
+    let templeId = asObjectId(b?.templeId) || undefined;
+    if (!templeId && b?.temple) {
+      const t = await Temple.findOne({ name: new RegExp(`^${String(b.temple).replace(/[.*+?^${}()|[\\]\\\\]/g, "\\$&")}$`, "i") });
+      if (t) templeId = t._id;
+    }
+    if (!b?.temple && !templeId) continue;
+    const doc = {
+      userId: userId || undefined,
+      templeId: templeId || undefined,
+      slotId: asObjectId(b?.slotId) || undefined,
+      temple: b?.temple || undefined,
+      date: b?.date,
+      time: b?.time,
+      phone: b?.phone,
+      service: b?.service,
+      quantity: Number(b?.quantity ?? 1),
+      fullName: b?.fullName || "",
+      email: b?.email || "",
+      amount: Number(b?.amount ?? 0),
+      convenienceFee: Number(b?.convenienceFee ?? 0),
+      totalAmount: Number(b?.totalAmount ?? (Number(b?.amount ?? 0) * Number(b?.quantity ?? 1) + Number(b?.convenienceFee ?? 0))),
+      paymentMethod: b?.paymentMethod || "Simulated",
+      bookingDate: b?.bookingDate ? new Date(b.bookingDate) : new Date()
+    };
+    const key = {
+      userId: doc.userId || null,
+      temple: doc.temple || "",
+      date: doc.date || "",
+      time: doc.time || "",
+      phone: doc.phone || "",
+      service: doc.service || ""
+    };
+    await Booking.updateOne(key, { $setOnInsert: doc }, { upsert: true });
+  }
+}
 
 async function main() {
   await mongoose.connect(uri, { dbName });
-  const User = mongoose.model("User", userSchema);
-  const Temple = mongoose.model("Temple", templeSchema);
 
   const temples = [
     { name: "Kedarnath Temple", location: "Uttarakhand", image: "https://images.unsplash.com/photo-1609766857041-ed402ea8069a", description: "Hindu temple dedicated to Lord Shiva." },
@@ -44,8 +157,17 @@ async function main() {
     { name: "Padmanabhaswamy", location: "Kerala", image: "https://images.unsplash.com/photo-1615484477778-ca3b77940c25", description: "Vishnu temple." }
   ];
 
-  await Temple.deleteMany({});
-  await Temple.insertMany(temples);
+  const dataDir = path.resolve(process.cwd(), "data");
+  const usersFile = path.join(dataDir, "users.json");
+  const templesFile = path.join(dataDir, "temples.json");
+  const slotsFile = path.join(dataDir, "darshanslots.json");
+  const bookingsFile = path.join(dataDir, "bookings.json");
+
+  await upsertTemples(temples);
+  await upsertTemples(readJsonArray(templesFile));
+  await upsertUsers(readJsonArray(usersFile));
+  await upsertSlots(readJsonArray(slotsFile));
+  await upsertBookings(readJsonArray(bookingsFile));
 
   const adminEmail = "admin@darshanease.local";
   const adminExists = await User.findOne({ email: adminEmail });

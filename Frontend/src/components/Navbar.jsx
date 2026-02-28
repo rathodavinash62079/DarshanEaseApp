@@ -111,6 +111,7 @@ const Navbar = () => {
             <li><Link to="/about">About</Link></li>
             <li><Link to="/contact">Contact</Link></li>
             <li className="menu-title">Admin</li>
+            <li><Link to="/admin/temples">Admin Dashboard</Link></li>
             <li><Link to="/admin/temples">Manage Temples</Link></li>
             <li><Link to="/admin/bookings">Manage Bookings</Link></li>
             <li><a onClick={() => { localStorage.removeItem('darshan_user'); alert('Logged out'); }}>Logout</a></li>

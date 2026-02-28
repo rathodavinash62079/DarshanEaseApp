@@ -15,9 +15,9 @@ function Login() {
       setError("Please enter email and password");
       return;
     }
-    const gmailOk = /^[A-Za-z0-9._%+-]+@gmail\.com$/i.test(email);
-    if (!gmailOk) {
-      setError("Invalid email. Use a @gmail.com address");
+    const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    if (!emailOk) {
+      setError("Invalid email address");
       return;
     }
     try {

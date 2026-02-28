@@ -2,6 +2,8 @@ import { Router } from "express";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import User from "../models/User.js";
+import fs from "fs";
+import path from "path";
 
 const router = Router();
 
@@ -30,8 +32,17 @@ router.post("/signup", async (req, res) => {
     if (exists) {
       return res.status(409).json({ success: false, message: "Email already registered" });
     }
-    const hash = await bcrypt.hash(password, 10);
-    await User.create({ name, email, password: hash });
+    const user = await User.create({ name, email, password });
+    try {
+      const p = path.resolve(process.cwd(), "users.json");
+      let arr = [];
+      try {
+        const raw = fs.readFileSync(p, "utf8");
+        arr = Array.isArray(JSON.parse(raw)) ? JSON.parse(raw) : [];
+      } catch {}
+      arr.push({ id: String(user._id), name: user.name, email: user.email, createdAt: new Date().toISOString() });
+      fs.writeFileSync(p, JSON.stringify(arr, null, 2));
+    } catch {}
     return res.status(201).json({ success: true, message: "User registered successfully" });
   } catch (e) {
     return res.status(500).json({ success: false, message: "Registration failed", detail: e.message });

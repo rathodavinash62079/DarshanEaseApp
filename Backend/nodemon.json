@@ -1,0 +1,25 @@
+{
+  "watch": [
+    "index.js",
+    "controller",
+    "model",
+    "routes",
+    "route",
+    "middleware"
+  ],
+  "ext": "js,mjs,cjs",
+  "legacyWatch": true,
+  "delay": "500ms",
+  "ignore": [
+    "data",
+    "*.json",
+    "*.log",
+    ".env",
+    "**/*.json",
+    "**/*.log",
+    "compass",
+    "scripts/*.ps1",
+    "Frontend/**",
+    "node_modules/**"
+  ]
+}

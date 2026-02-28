@@ -1,0 +1,18 @@
+[
+  {
+    "templeId": { "$oid": "000000000000000000000000" },
+    "date": "2026-03-01",
+    "startTime": "10:00 AM",
+    "endTime": "11:00 AM",
+    "availableSeats": 100,
+    "price": 100
+  },
+  {
+    "templeId": { "$oid": "000000000000000000000000" },
+    "date": "2026-03-01",
+    "startTime": "12:00 PM",
+    "endTime": "01:00 PM",
+    "availableSeats": 80,
+    "price": 150
+  }
+]

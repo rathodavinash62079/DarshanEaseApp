@@ -1,0 +1,10 @@
+[
+  {
+    "templeName": "Kedarnath Temple",
+    "date": "2026-03-15",
+    "startTime": "10:00 AM",
+    "endTime": "11:00 AM",
+    "availableSeats": 50,
+    "price": 100
+  }
+]

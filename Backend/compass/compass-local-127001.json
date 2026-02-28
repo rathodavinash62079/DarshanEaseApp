@@ -1,0 +1,22 @@
+{
+  "connections": [
+    {
+      "id": "local-127001-27017",
+      "favorite": {
+        "name": "Local MongoDB (127.0.0.1:27017)"
+      },
+      "connectionOptions": {
+        "connectionString": "mongodb://127.0.0.1:27017/?directConnection=true"
+      }
+    },
+    {
+      "id": "local-localhost-27017",
+      "favorite": {
+        "name": "Local MongoDB (localhost:27017)"
+      },
+      "connectionOptions": {
+        "connectionString": "mongodb://localhost:27017/?directConnection=true"
+      }
+    }
+  ]
+}

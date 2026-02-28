@@ -1,0 +1,19 @@
+[
+  {
+    "userId": { "$oid": "000000000000000000000000" },
+    "templeId": { "$oid": "000000000000000000000000" },
+    "slotId": { "$oid": "000000000000000000000000" },
+    "temple": "Kedarnath Temple",
+    "date": "2026-03-10",
+    "time": "10:00 AM",
+    "phone": "9999999999",
+    "service": "General Darshan",
+    "quantity": 2,
+    "fullName": "Sample User",
+    "email": "sample@example.com",
+    "amount": 100,
+    "convenienceFee": 20,
+    "totalAmount": 120,
+    "paymentMethod": "Simulated"
+  }
+]

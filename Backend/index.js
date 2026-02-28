@@ -10,6 +10,8 @@ import slotRoutes from "./routes/slot.route.js";
 import ticketRoutes from "./routes/ticketRoutes.js";
 import Temple from "./model/temple.model.js";
 import userRouter from "./routes/user.js";
+import connectDB from "./config/db.js";
+import { register as registerCtrl, login as loginCtrl } from "./controllers/userController.js";
 
 dotenv.config();
 const app = express();
@@ -19,9 +21,28 @@ const MONGO_URI = process.env.MONGO_URI || "mongodb://127.0.0.1:27017/darshaneas
 app.use(cors({ origin: true, credentials: true }));
 app.use(express.json());
 
+let serverStarted = false;
+function startServerOnce() {
+  if (serverStarted) return;
+  serverStarted = true;
+  app.listen(PORT, () => {
+    console.log(`API listening on http://localhost:${PORT}`);
+  });
+}
+
+mongoose.connection.on("connecting", () => console.log("Mongo connecting..."));
+mongoose.connection.on("connected", () => console.log("Mongo connection state: connected"));
+mongoose.connection.on("disconnected", () => console.log("Mongo connection state: disconnected"));
+mongoose.connection.on("error", (err) => console.error("Mongo connection error:", err.message));
+
 async function connectMongo() {
-  await mongoose.connect(MONGO_URI, { dbName: process.env.MONGO_DB || "darshanease" });
-  console.log("Mongo connected");
+  const dbName = process.env.MONGO_DB || "darshanease";
+  await connectDB();
+  const masked = MONGO_URI.includes("@")
+    ? MONGO_URI.split("@")[1]
+    : MONGO_URI.replace(/\/\/([^/]+)\/?.*$/, "//$1");
+  console.log("MongoDB is connected");
+  console.log(`Mongo connected -> ${masked} db=${dbName}`);
   const count = await Temple.countDocuments();
   if (count === 0) {
     await Temple.insertMany([
@@ -31,13 +52,30 @@ async function connectMongo() {
     ]);
     console.log("Seeded default temples");
   }
+  startServerOnce();
 }
-connectMongo().catch((e) => console.error("Mongo error:", e.message));
+function startMongoRetry(delayMs = 5000) {
+  connectMongo().catch((e) => {
+    console.error("Mongo error:", e.message);
+    setTimeout(() => startMongoRetry(Math.min(delayMs * 1.5, 30000)), delayMs);
+  });
+}
+startMongoRetry();
+
+app.get("/health/db", (_req, res) => {
+  const state = mongoose.connection.readyState;
+  res.json({ ok: state === 1, state });
+});
 
 app.use("/api/auth", authRouter);
 app.use("/api/temples", templeRouter);
 app.use("/api", bookingRoutes);
-app.use("/api", userRoutes);
+app.use("/api/users", userRoutes);
+app.post("/api/users/register", registerCtrl);
+app.post("/api/users/login", loginCtrl);
+app.post("/api/users/signup", registerCtrl);
+app.post("/api/users/signin", loginCtrl);
+app.get("/api/users/ping", (_req, res) => res.json({ pong: true }));
 app.use("/api/slots", slotRoutes);
 app.use("/api", ticketRoutes);
 app.use("/user", userRouter);
@@ -53,8 +91,4 @@ app.use((err, _req, res, _next) => {
     return res.status(400).json({ success: false, message: "Invalid JSON in request body" });
   }
   return res.status(500).json({ success: false, message: "Internal server error" });
-});
-
-app.listen(PORT, () => {
-  console.log(`API listening on http://localhost:${PORT}`);
 });

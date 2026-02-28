@@ -1,0 +1,42 @@
+[
+  {
+    "name": "Kedarnath Temple",
+    "location": "Uttarakhand",
+    "image": "https://images.unsplash.com/photo-1609766857041-ed402ea8069a",
+    "description": "Hindu temple dedicated to Lord Shiva.",
+    "darshanStartTime": "06:00 AM",
+    "darshanEndTime": "08:00 PM"
+  },
+  {
+    "name": "Badrinath Temple",
+    "location": "Uttarakhand",
+    "image": "https://images.unsplash.com/photo-1627894483216-2138af692e32",
+    "description": "Dedicated to Lord Vishnu.",
+    "darshanStartTime": "06:00 AM",
+    "darshanEndTime": "09:00 PM"
+  },
+  {
+    "name": "Tirupati Balaji",
+    "location": "Andhra Pradesh",
+    "image": "https://images.unsplash.com/photo-1615378539073-8c0b3b5b7e33",
+    "description": "Temple dedicated to Venkateswara.",
+    "darshanStartTime": "05:00 AM",
+    "darshanEndTime": "10:00 PM"
+  },
+  {
+    "name": "Golden Temple",
+    "location": "Amritsar",
+    "image": "https://images.unsplash.com/photo-1589308078054-8321c87b7d9e",
+    "description": "Harmandir Sahib.",
+    "darshanStartTime": "04:00 AM",
+    "darshanEndTime": "11:00 PM"
+  },
+  {
+    "name": "Somnath Temple",
+    "location": "Gujarat",
+    "image": "https://images.unsplash.com/photo-1625047509248-ec889cbff17f",
+    "description": "Jyotirlinga shrine of Shiva.",
+    "darshanStartTime": "06:00 AM",
+    "darshanEndTime": "09:00 PM"
+  }
+]

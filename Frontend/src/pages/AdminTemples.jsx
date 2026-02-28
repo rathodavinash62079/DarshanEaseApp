@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+import { api } from "../lib/api";
 
 const AdminTemples = () => {
   const [temples, setTemples] = useState([]);
@@ -9,12 +10,12 @@ const AdminTemples = () => {
   const [image, setImage] = useState("");
 
   useEffect(() => {
-    setTimeout(() => {
+    (async () => {
       try {
-        const data = JSON.parse(localStorage.getItem("admin_temples") || "[]");
+        const { data } = await api.get("/api/temples");
         setTemples(Array.isArray(data) ? data : []);
       } catch { setTemples([]); }
-    }, 0);
+    })();
   }, []);
 
   const save = (list) => {
@@ -30,9 +31,19 @@ const AdminTemples = () => {
     setName(""); setLocation(""); setImage("");
   };
 
-  const removeTemple = (idx) => {
-    const list = temples.filter((_, i) => i !== idx);
-    save(list);
+  const removeTemple = async (idx) => {
+    const t = temples[idx];
+    const id = t?._id;
+    if (!id) {
+      const list = temples.filter((_, i) => i !== idx);
+      save(list);
+      return;
+    }
+    try {
+      await api.delete(`/api/temples/${id}`);
+      const list = temples.filter((_, i) => i !== idx);
+      save(list);
+    } catch {}
   };
 
   return (
@@ -47,7 +58,15 @@ const AdminTemples = () => {
               <input value={name} onChange={(e)=>setName(e.target.value)} className="input input-bordered w-full" placeholder="Temple Name" />
               <input value={location} onChange={(e)=>setLocation(e.target.value)} className="input input-bordered w-full" placeholder="Location" />
               <input value={image} onChange={(e)=>setImage(e.target.value)} className="input input-bordered w-full" placeholder="Image URL" />
-              <button className="btn btn-primary w-full">Add</button>
+              <button className="btn btn-primary w-full" onClick={async (e) => {
+                e.preventDefault();
+                if (!name || !location || !image) return;
+                try {
+                  const { data } = await api.post("/api/temples", { name, location, image });
+                  setTemples([...(Array.isArray(temples)?temples:[]), data]);
+                  setName(""); setLocation(""); setImage("");
+                } catch {}
+              }}>Add</button>
             </form>
             <div className="bg-white p-4 rounded shadow">
               <h2 className="font-semibold mb-2">Current Temples ({temples.length})</h2>

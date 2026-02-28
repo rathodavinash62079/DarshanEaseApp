@@ -1,6 +1,8 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import User from "../model/user.model.js";
+import fs from "fs";
+import path from "path";
 
 export async function register(req, res) {
   const { name, email, password } = req.body || {};
@@ -8,8 +10,17 @@ export async function register(req, res) {
   try {
     const exists = await User.findOne({ email });
     if (exists) return res.status(409).json({ error: "Email already registered" });
-    const hash = await bcrypt.hash(password, 10);
-    const user = await User.create({ name, email, password: hash });
+    const user = await User.create({ name, email, password });
+    try {
+      const p = path.resolve(process.cwd(), "users.json");
+      let arr = [];
+      try {
+        const raw = fs.readFileSync(p, "utf8");
+        arr = Array.isArray(JSON.parse(raw)) ? JSON.parse(raw) : [];
+      } catch {}
+      arr.push({ id: String(user._id), name: user.name, email: user.email, createdAt: new Date().toISOString() });
+      fs.writeFileSync(p, JSON.stringify(arr, null, 2));
+    } catch {}
     const token = jwt.sign({ id: user._id, email }, process.env.JWT_SECRET || "devsecret", { expiresIn: "7d" });
     return res.json({ token, user: { id: user._id, name, email } });
   } catch (e) {
@@ -24,12 +35,35 @@ export async function login(req, res) {
   }
   try {
     const normalizedEmail = String(email).trim();
-    const pattern = new RegExp(`^${normalizedEmail.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}$`, "i");
+    const escaped = normalizedEmail.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const pattern = new RegExp(`^${escaped}$`, "i");
     const user = await User.findOne({ email: { $regex: pattern } });
     if (!user) {
       return res.status(404).json({ success: false, message: "User not registered, please signup first" });
     }
-    const ok = await bcrypt.compare(String(password), user.password);
+    const rawPass = String(password);
+    const stored = String(user.password || "");
+    let ok = false;
+    // Support legacy/plain-text passwords imported from JSON
+    const isBcrypt = /^\$2[aby]\$/.test(stored);
+    if (isBcrypt) {
+      try {
+        ok = await bcrypt.compare(rawPass, stored);
+      } catch (cmpErr) {
+        console.error("Login error: bcrypt compare failed");
+        ok = false;
+      }
+    } else {
+      ok = stored.length > 0 && stored === rawPass;
+      // If plain text matched, upgrade hash in background
+      if (ok) {
+        try {
+          const hash = await bcrypt.hash(rawPass, 10);
+          user.password = hash;
+          await user.save();
+        } catch (_) { /* silent */ }
+      }
+    }
     if (!ok) {
       return res.status(401).json({ success: false, message: "Invalid password" });
     }
@@ -39,6 +73,7 @@ export async function login(req, res) {
     const token = jwt.sign({ id: user._id, email }, process.env.JWT_SECRET || "devsecret", { expiresIn: "7d" });
     return res.status(200).json({ success: true, message: "Login successful", token, user: { id: user._id, name: user.name, email: user.email } });
   } catch (e) {
-    return res.status(500).json({ success: false, message: "Internal server error" });
+    console.error("Login error:", e.message);
+    return res.status(500).json({ success: false, message: e.message || "Internal server error" });
   }
 }

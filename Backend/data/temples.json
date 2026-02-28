@@ -1,0 +1,14 @@
+[
+  {
+    "name": "Kedarnath Temple",
+    "location": "Uttarakhand",
+    "image": "https://images.unsplash.com/photo-1609766857041-ed402ea8069a",
+    "description": "Hindu temple dedicated to Lord Shiva."
+  },
+  {
+    "name": "Badrinath Temple",
+    "location": "Uttarakhand",
+    "image": "https://images.unsplash.com/photo-1627894483216-2138af692e32",
+    "description": "Dedicated to Lord Vishnu."
+  }
+]

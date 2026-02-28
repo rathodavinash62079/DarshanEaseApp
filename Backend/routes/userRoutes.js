@@ -1,17 +1,10 @@
-import express from "express";
-import jwt from "jsonwebtoken";
-import User from "../models/User.js";
+import { Router } from "express";
+import { register, login } from "../controllers/userController.js";
 
-const router = express.Router();
-
-router.post("/login", async (req, res) => {
-  const { email, password } = req.body;
-  const user = await User.findOne({ email });
-  if (!user) {
-    return res.status(400).json({ message: "User not found" });
-  }
-  const token = jwt.sign({ id: user._id }, "secret123", { expiresIn: "1d" });
-  res.json({ message: "Login successful", token });
-});
-
+const router = Router();
+router.get("/ping", (_req, res) => res.json({ pong: true }));
+router.post("/register", register);
+router.post("/login", login);
+router.post("/signup", register);
+router.post("/signin", login);
 export default router;

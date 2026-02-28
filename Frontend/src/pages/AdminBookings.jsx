@@ -1,23 +1,56 @@
 import React, { useEffect, useState } from "react";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+import { api } from "../lib/api";
 
 const AdminBookings = () => {
   const [bookings, setBookings] = useState([]);
+  const [err, setErr] = useState("");
+  const [needLogin, setNeedLogin] = useState(false);
 
-  const load = () => {
+  const load = async () => {
+    setErr("");
+    setNeedLogin(false);
     try {
-      const data = JSON.parse(localStorage.getItem("darshan_bookings") || "[]");
+      const { data } = await api.get("/api/book");
       setBookings(Array.isArray(data) ? data : []);
-    } catch { setBookings([]); }
+    } catch (e) {
+      const status = e?.response?.status;
+      if (status === 401) {
+        setNeedLogin(true);
+        setErr("Please login to view bookings");
+      } else {
+        setErr(e?.response?.data?.error || "Failed to load bookings");
+      }
+      setBookings([]);
+    }
   };
 
-  useEffect(() => { setTimeout(load, 0); }, []);
+  useEffect(() => {
+    load();
+    const onAuth = () => load();
+    window.addEventListener("darshan-auth-change", onAuth);
+    window.addEventListener("storage", onAuth);
+    return () => {
+      window.removeEventListener("darshan-auth-change", onAuth);
+      window.removeEventListener("storage", onAuth);
+    };
+  }, []);
 
-  const remove = (idx) => {
-    const list = bookings.filter((_, i) => i !== idx);
-    setBookings(list);
-    localStorage.setItem("darshan_bookings", JSON.stringify(list));
+  const remove = async (idx) => {
+    const b = bookings[idx];
+    const id = b?._id;
+    if (!id) {
+      const list = bookings.filter((_, i) => i !== idx);
+      setBookings(list);
+      return;
+    }
+    try {
+      await api.delete(`/api/book/${id}`);
+      await load();
+    } catch (e) {
+      setErr(e?.response?.data?.error || "Failed to delete booking");
+    }
   };
 
   return (
@@ -29,6 +62,19 @@ const AdminBookings = () => {
             <h1 className="text-2xl font-semibold">Admin: Manage Bookings</h1>
             <button className="btn btn-outline" onClick={load}>Refresh</button>
           </div>
+          {err && (
+            <div className="alert alert-error mb-3">
+              <span>{err}</span>
+              {needLogin && (
+                <button
+                  className="btn btn-sm ml-3"
+                  onClick={() => document.getElementById("my_modal_3")?.showModal()}
+                >
+                  Login
+                </button>
+              )}
+            </div>
+          )}
           <div className="overflow-x-auto bg-white rounded shadow">
             <table className="table">
               <thead>
@@ -50,8 +96,8 @@ const AdminBookings = () => {
                     <td>{b.service}</td>
                     <td>{b.date}</td>
                     <td>{b.time}</td>
-                    <td>{b.fullName}</td>
-                    <td>₹{b.amount || "-"}</td>
+                    <td>{b.fullName || "-"}</td>
+                    <td>₹{b.amount ?? b.totalAmount ?? "-"}</td>
                     <td>{b.paymentMethod || "-"}</td>
                     <td><button className="btn btn-error btn-xs" onClick={()=>remove(idx)}>Delete</button></td>
                   </tr>
